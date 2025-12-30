@@ -1,0 +1,82 @@
+services:
+  landing:
+    build:
+      context: ./landing
+      target: dev
+    develop:
+      watch:
+        - action: sync
+          path: ./landing
+          target: /app
+          ignore:
+            - node_modules/
+            - .git/
+            - .DS_Store
+        - action: rebuild
+          path: ./landing/package.json
+
+  fir:
+    build:
+      context: ./fir
+      target: dev
+    develop:
+      watch:
+        - action: sync
+          path: ./fir
+          target: /app
+          ignore:
+            - node_modules/
+            - .git/
+            - .DS_Store
+        - action: rebuild
+          path: ./fir/package.json
+
+  simulator:
+    build:
+      context: ./simulator
+      target: dev
+    develop:
+      watch:
+        - action: sync
+          path: ./simulator
+          target: /app
+          ignore:
+            - node_modules/
+            - .git/
+            - .DS_Store
+        - action: rebuild
+          path: ./simulator/package.json
+
+  anomaly:
+    build:
+      context: ./anomaly
+      target: dev
+    develop:
+      watch:
+        - action: sync
+          path: ./anomaly
+          target: /app
+          ignore:
+            - node_modules/
+            - .git/
+            - .DS_Store
+        - action: rebuild
+          path: ./anomaly/package.json
+
+  erp-adapter:
+    build:
+      context: ./erp-adapter
+      target: dev
+    develop:
+      watch:
+        - action: sync
+          path: ./erp-adapter
+          target: /app
+          ignore:
+            - node_modules/
+            - .git/
+            - .DS_Store
+        - action: rebuild
+          path: ./erp-adapter/package.json
+
+

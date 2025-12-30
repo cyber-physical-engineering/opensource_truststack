@@ -1,0 +1,15 @@
+{
+  "name": "truststack_suite",
+  "version": "1.0.0",
+  "description": "A lightweight, docker-compose driven demo stack with: - Landing/status UI - OpenObserve (logs/observability) - FIR (incident response demo) - Grafana (dashboards) - Simulator (sends sample metrics/logs) - Anomaly (simple z-score/EMA anomaly detector) - ERP Adapter (demo bridge to ERP/MES-lite)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "json-canonicalize": "^1.0.6"
+  }
+}

@@ -1,0 +1,25 @@
+.DS_Store
+*.log
+
+# Local env files (never commit)
+.env
+.env.*
+env.current*
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Editor / OS noise
+.vscode/
+.idea/
+
+# Local build / cache artifacts
+dist/
+build/
+coverage/
+
+# Reference implementation local state (keep only the sample seed file)
+reference-implementation/state/*
+!reference-implementation/state/erp_seed.json
+

@@ -1,0 +1,128 @@
+services:
+  # Keep existing erp_mariadb and erp_redis from base compose (mes profile)
+  # Add official ERPNext topology services
+
+  erp_backend:
+    image: frappe/erpnext-worker:latest
+    profiles: ["mes"]
+    environment:
+      FRAPPE_SITE_NAME_HEADER: ${ERP_SITE_NAME:-site.local}
+      DB_HOST: erp_mariadb
+      REDIS_CACHE: redis://erp_redis:6379
+      REDIS_QUEUE: redis://erp_redis:6379
+      REDIS_SOCKETIO: redis://erp_redis:6379
+    depends_on:
+      erp_mariadb:
+        condition: service_healthy
+      erp_redis:
+        condition: service_healthy
+    volumes:
+      - erp_sites_data:/home/frappe/frappe-bench/sites
+      - erp_logs_data:/home/frappe/frappe-bench/logs
+    restart: unless-stopped
+
+  erp_queue:
+    image: frappe/erpnext-worker:latest
+    profiles: ["mes"]
+    command: ["bench", "worker"]
+    environment:
+      DB_HOST: erp_mariadb
+      REDIS_CACHE: redis://erp_redis:6379
+      REDIS_QUEUE: redis://erp_redis:6379
+      REDIS_SOCKETIO: redis://erp_redis:6379
+    depends_on:
+      erp_backend:
+        condition: service_started
+    volumes:
+      - erp_sites_data:/home/frappe/frappe-bench/sites
+      - erp_logs_data:/home/frappe/frappe-bench/logs
+    restart: unless-stopped
+
+  erp_scheduler:
+    image: frappe/erpnext-worker:latest
+    profiles: ["mes"]
+    command: ["bench", "schedule"]
+    environment:
+      DB_HOST: erp_mariadb
+      REDIS_CACHE: redis://erp_redis:6379
+      REDIS_QUEUE: redis://erp_redis:6379
+      REDIS_SOCKETIO: redis://erp_redis:6379
+    depends_on:
+      erp_backend:
+        condition: service_started
+    volumes:
+      - erp_sites_data:/home/frappe/frappe-bench/sites
+      - erp_logs_data:/home/frappe/frappe-bench/logs
+    restart: unless-stopped
+
+  erp_socketio:
+    image: frappe/frappe-socketio:latest
+    profiles: ["mes"]
+    environment:
+      FRAPPE_SITE_NAME_HEADER: ${ERP_SITE_NAME:-site.local}
+      REDIS_CACHE: redis://erp_redis:6379
+      REDIS_QUEUE: redis://erp_redis:6379
+      REDIS_SOCKETIO: redis://erp_redis:6379
+    depends_on:
+      erp_backend:
+        condition: service_started
+    volumes:
+      - erp_sites_data:/home/frappe/frappe-bench/sites
+    restart: unless-stopped
+
+  erp_frontend:
+    image: frappe/erpnext-nginx:latest
+    profiles: ["mes"]
+    environment:
+      FRAPPE_SITE_NAME_HEADER: ${ERP_SITE_NAME:-site.local}
+      BACKEND: erp_backend:8000
+      SOCKETIO: erp_socketio:9000
+    depends_on:
+      erp_backend:
+        condition: service_started
+      erp_socketio:
+        condition: service_started
+    ports:
+      - "${ERP_MES_HOST_PORT:-3136}:8080"
+    volumes:
+      - erp_sites_data:/var/www/html/sites:ro
+      - erp_logs_data:/var/log:rw
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/method/ping | grep -q pong"]
+      interval: 6s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  erp_site_creator:
+    image: frappe/erpnext-worker:latest
+    profiles: ["mes"]
+    command:
+      - bash
+      - -lc
+      - |
+        set -e
+        cd /home/frappe/frappe-bench
+        if [ ! -f sites/currentsite.txt ]; then
+          bench new-site ${ERP_SITE_NAME:-site.local} \
+            --db-host erp_mariadb \
+            --mariadb-root-password ${ERP_DB_ROOT_PASSWORD} \
+            --admin-password ${ERP_BOOTSTRAP_ADMIN_PASSWORD} \
+            --no-mariadb-socket --force
+          bench --site ${ERP_SITE_NAME:-site.local} install-app erpnext
+          echo ${ERP_SITE_NAME:-site.local} > sites/currentsite.txt
+        fi
+        echo "Site ready."
+        sleep 2
+    depends_on:
+      erp_backend:
+        condition: service_started
+    restart: "no"
+    volumes:
+      - erp_sites_data:/home/frappe/frappe-bench/sites
+      - erp_logs_data:/home/frappe/frappe-bench/logs
+
+volumes:
+  erp_sites_data:
+  erp_logs_data:
+

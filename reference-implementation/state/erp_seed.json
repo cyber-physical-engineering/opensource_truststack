@@ -1,0 +1,9 @@
+{
+  "company": "DemoCo",
+  "item_fg": "ITEM-1",
+  "item_rm": "ITEM-1-RM",
+  "bom": "BOM-ITEM-1-001",
+  "workstation": "WC-1",
+  "work_order": "MFG-WO-2025-00001",
+  "ts": "2025-11-12T20:22:00.871Z"
+}

@@ -1,0 +1,11 @@
+{
+  "record_id": "REC-1",
+  "doctype": "Work Order",
+  "name": "WO-1",
+  "status": "Draft",
+  "production_item": "ITEM-1",
+  "qty": 1,
+  "bom_no": "BOM-ITEM-1"
+}
+
+

@@ -1,0 +1,32 @@
+{
+  "uid": "truststack-demo",
+  "title": "TrustStack Demo",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Anomaly Count",
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 6 },
+      "targets": [{ "expr": "anomaly_count", "instant": true, "refId": "A" }],
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["last"], "fields": "", "values": false } }
+    },
+    {
+      "type": "stat",
+      "title": "Last Anomaly",
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 6 },
+      "targets": [{ "expr": "(last_anomaly_ts_seconds and last_anomaly_ts_seconds > 0) * 1000", "instant": true, "refId": "A" }],
+      "fieldConfig": { "defaults": { "unit": "dateTimeFromNow" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["last"], "fields": "", "values": false }, "orientation": "horizontal", "textMode": "auto", "colorMode": "value" }
+    },
+    {
+      "type": "timeseries",
+      "title": "Anomaly Activity (increase over 5m)",
+      "gridPos": { "x": 0, "y": 6, "w": 24, "h": 8 },
+      "targets": [{ "expr": "increase(anomaly_count[5m])", "refId": "A" }],
+      "options": { "legend": { "displayMode": "hidden" }, "tooltip": { "mode": "single" } }
+    }
+  ]
+}
+
+

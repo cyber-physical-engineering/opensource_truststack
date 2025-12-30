@@ -1,0 +1,18 @@
+services:
+  landing:
+    image: ghcr.io/${OWNER:?set}/truststack-landing:${TAG:?set}
+    build: null
+  fir:
+    image: ghcr.io/${OWNER:?set}/truststack-fir:${TAG:?set}
+    build: null
+  simulator:
+    image: ghcr.io/${OWNER:?set}/truststack-simulator:${TAG:?set}
+    build: null
+  anomaly:
+    image: ghcr.io/${OWNER:?set}/truststack-anomaly:${TAG:?set}
+    build: null
+  erp-adapter:
+    image: ghcr.io/${OWNER:?set}/truststack-erp-adapter:${TAG:?set}
+    build: null
+
+
