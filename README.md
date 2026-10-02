@@ -156,7 +156,7 @@ Two small test scripts exist. `npm run test:lite` in `erp-bridge/` checks the po
 ## Limits
 
 - The index is a reading list. Fifty-six of its 63 tools do not run in the demo.
-- The stack was not run end to end on a Mac in October 2026. CI's stack job is the first full run.
+- The stack has run end to end only in CI's Compose job, not on a Mac.
 - The case tracker's login tokens come from `Math.random` and travel in the URL. It is demo plumbing, never access control.
 - The proof script stores an unsigned hash in an editable database row. Nothing signs it or anchors it elsewhere.
 - The event relay never reads from or writes to an ERP; "simulated mode" means `ERP_URL` is unset.
