@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  services:
+    name: Node services
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Syntax check
+        run: find reference-implementation -name '*.js' -not -path '*/node_modules/*' -print0 | xargs -0 -n1 node --check
+      - name: Clean installs from the lockfiles
+        run: |
+          for svc in anomaly erp-adapter erp-bridge fir landing simulator; do
+            (cd "reference-implementation/$svc" && npm ci --no-audit --no-fund)
+          done
+
+  stack:
+    name: Docker Compose stack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Start the default profile and wait for every health check
+        working-directory: reference-implementation
+        run: |
+          cp env.example .env
+          docker compose up -d --build --wait --wait-timeout 300
+      - name: Check the published endpoints
+        run: |
+          curl -sf http://localhost:3030/healthz
+          curl -sf http://localhost:3032/healthz
+          curl -sf http://localhost:3035/healthz
+          curl -sf http://localhost:3040/healthz
+          curl -sf -o /dev/null http://localhost:3031/
+          curl -sf -o /dev/null http://localhost:3033/api/health
+          curl -sf -o /dev/null http://127.0.0.1:3034/
+          timeout 5 bash -c '</dev/tcp/127.0.0.1/5432'
+      - name: Show logs if anything failed
+        if: failure()
+        working-directory: reference-implementation
+        run: docker compose logs --no-color | tail -n 300
+      - name: Stop the stack
+        if: always()
+        working-directory: reference-implementation
+        run: docker compose down -v
