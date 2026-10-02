@@ -162,3 +162,7 @@ Two small test scripts exist. `npm run test:lite` in `erp-bridge/` checks the po
 - The `mes` profile mixes a pinned ERPNext image with three companion images last updated in 2023, and `env.example` gives `erp_frontend` and `erp_nginx` the same host port.
 - The FAQ page prints the demo logins to anyone who can reach port 3034 on the host.
 - Nothing here is specific to healthcare, defense or any other sector. The one industry example is the ERPNext Work Order flow.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
