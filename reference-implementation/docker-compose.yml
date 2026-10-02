@@ -111,7 +111,7 @@ services:
       ERP_BRIDGE_PUBLIC_URL: ${ERP_BRIDGE_URL:-http://localhost:${ERP_BRIDGE_HOST_PORT:-3041}}
     ports:
       - "${LANDING_HOST_PORT:-3030}:3005"
-      - "${FAQ_HOST_PORT:-3034}:3007"
+      - "127.0.0.1:${FAQ_HOST_PORT:-3034}:3007"
     depends_on:
       postgres:
         condition: service_healthy

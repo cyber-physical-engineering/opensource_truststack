@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "test:lite": "node erp-adapter/test-lite/test_rate_ready.js",
+    "test:lite": "node test-lite/test_rate_ready.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {

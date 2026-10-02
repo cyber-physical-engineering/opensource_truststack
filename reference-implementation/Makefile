@@ -68,10 +68,10 @@ psql:
 env-validate:
 	@missing=0; \
 	for var in PGUSER PGPASSWORD PGDATABASE PGPORT; do \
-	  if [ -z "$$${var}" ]; then echo "Missing $${var} in .env"; missing=1; fi; \
+	  if [ -z "$${!var}" ]; then echo "Missing $${var} in .env"; missing=1; fi; \
 	done; \
 	if [ $$missing -ne 0 ]; then \
-	  echo "Environment validation failed. Copy .env.example to .env and update values."; \
+	  echo "Environment validation failed. Copy env.example to .env and update values."; \
 	  exit $$missing; \
 	fi
 

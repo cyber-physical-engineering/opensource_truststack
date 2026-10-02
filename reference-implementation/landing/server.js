@@ -16,10 +16,6 @@ const port = parseInt(process.env.LANDING_PORT || '3005', 10);
 const ooPublicUrl = process.env.OO_PUBLIC_URL || 'http://localhost:3031';
 const firPublicUrl = process.env.FIR_PUBLIC_URL || 'http://localhost:3032';
 const grafanaPublicUrl = process.env.GRAFANA_PUBLIC_URL || 'http://localhost:3033';
-// Planned/public URLs for roadmap items
-const proofPublicUrl = process.env.PROOF_PUBLIC_URL || '';
-const wazuhPublicUrl = process.env.WAZUH_PUBLIC_URL || '';
-const tunnelPublicUrl = process.env.TUNNEL_PUBLIC_URL || '';
 // Internal URLs (inside Docker network) used for health pings
 const ooInternalUrl = process.env.OO_INTERNAL_URL || 'http://openobserve:5080';
 const firInternalUrl = process.env.FIR_INTERNAL_URL || 'http://fir:3006';
@@ -151,7 +147,7 @@ async function erpPhaseAStatus() {
   }
 }
 
-// Favicon: Inverted BDP logo (white inside, purple outside)
+// Favicon: a purple square with a white H
 app.get('/favicon.svg', (_req, res) => {
   const brand = '#8000ff';
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
@@ -166,7 +162,7 @@ app.get('/favicon.svg', (_req, res) => {
   res.type('image/svg+xml').status(200).send(svg);
 });
 
-// Header logo: BDP square logo (purple shapes on white background)
+// Header logo: a purple mark on white
 app.get('/logo.svg', (_req, res) => {
   const brand = '#8000ff';
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
@@ -246,25 +242,17 @@ app.get('/', async (_req, res) => {
   const erpBadge = (erpMes && erpMes.ok)
     ? `<span class="badge ok" title="ERPNext mes profile ready">ERP (mes)</span>`
     : ((erpPhaseA && erpPhaseA.ok) || mesProfileFlag
-        ? `<span class="badge init" title="ERPNext initializing — first boot can take 5–10 minutes on Apple Silicon">initializing…</span>`
+        ? `<span class="badge init" title="ERPNext is starting. Its first boot is slow; wait and refresh.">initializing…</span>`
         : ``);
 
   const svc = [
     { name: 'Postgres', desc: 'Primary database', ok: db.ok, error: db.error },
     { name: 'OpenObserve', desc: 'Logs & observability', ok: oo.ok, open: ooPublicUrl, error: oo.error },
-    { name: 'FIR', desc: 'Incident response', ok: fir.ok, open: firPublicUrl, error: fir.error },
+    { name: 'FIR (case tracker)', desc: 'Minimal demo case tracker', ok: fir.ok, open: firPublicUrl, error: fir.error },
     { name: 'Grafana', desc: 'Dashboards & metrics', ok: graf.ok, open: grafanaPublicUrl, error: graf.error },
-    { name: 'erp-adapter', desc: `ERP integration shim${(!erpUrl && erpDemoEnabled) ? ' • Simulated' : ''}`, ok: erpA.ok, open: erpAdapterPublicUrl, error: erpA.error },
+    { name: 'erp-adapter', desc: `ERP event relay${(!erpUrl && erpDemoEnabled) ? ' • no ERP configured' : ''}`, ok: erpA.ok, open: erpAdapterPublicUrl, error: erpA.error },
     { name: 'erp-bridge', desc: `ERPNext event bridge${(erpBridge && erpBridge.ok && erpBridge.cooldownMs>0) ? ` • cooldown ${Math.ceil(erpBridge.cooldownMs/1000)}s` : ''}`, ok: erpBridge.ok, open: erpBridgePublicUrl, error: erpBridge.error },
   ];
-
-  // Planned roadmap items (greyed with Coming tag)
-  const plannedTag = 'Coming 1Q26';
-  svc.push(
-    { name: 'Proof', desc: `Hashing & integrity • ${plannedTag}`, planned: true, open: proofPublicUrl || null },
-    { name: 'Wazuh (XDR)', desc: `XDR console • ${plannedTag}`, planned: true, open: wazuhPublicUrl || null },
-    { name: 'Cloudflare Tunnel', desc: `Remote demo URL • ${plannedTag}`, planned: true, open: tunnelPublicUrl || null },
-  );
 
   const brand = '#8000ff';
 
@@ -273,12 +261,12 @@ app.get('/', async (_req, res) => {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TrustStack™ Suite — HealthSec Alliance</title>
+    <title>Trust Stack Demo: status</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <style>
       :root{
-        --brand:${brand}; /* BDP purple remains primary */
-        --accent-orange:#FF9900; /* CyberActa orange accent */
+        --brand:${brand}; /* primary color */
+        --accent-orange:#FF9900; /* accent color */
         --accent-orange-dark:#F39200;
         --ink:#0f172a;
         --muted:#64748b;
@@ -300,7 +288,6 @@ app.get('/', async (_req, res) => {
       a{color:inherit}
       .container{max-width:1080px;margin:0 auto;padding:28px 20px 60px}
       .hero{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px 0;background:linear-gradient(90deg,var(--brand) 0%,var(--brand) 60%,var(--accent-orange) 100%);background-size:100% 2px;background-repeat:no-repeat;background-position:0 100%}
-      .partner-logo{width:140px;height:auto;margin-left:auto;display:block}
       .brand{display:flex;flex-direction:column}
       .brand .name{font-size:28px;font-weight:800;letter-spacing:0.2px;color:var(--brand)}
       .brand .suite{font-size:14px;color:var(--muted);font-weight:600}
@@ -345,13 +332,12 @@ app.get('/', async (_req, res) => {
   </head>
   <body>
     <div class="container">
-      <div class="hero" role="banner" aria-label="HealthSec Alliance">
+      <div class="hero" role="banner" aria-label="Trust Stack Demo">
         <div class="brand">
-          <div class="name">TrustStack™ Suite</div>
-          <div class="suite">HealthSec Alliance</div>
-          <div class="tagline">IT/OT cybersecurity, traceability, and proof for regulated industries</div>
+          <div class="name">Trust Stack Demo</div>
+          <div class="suite">Local demo stack</div>
+          <div class="tagline">Telemetry, anomaly detection and a hashed record, end to end</div>
         </div>
-        <img src="/cyberacta-logo.png" alt="CyberActa" class="partner-logo" onerror="this.remove()" />
       </div>
 
       <div class="card">
@@ -360,7 +346,6 @@ app.get('/', async (_req, res) => {
             <div class="title">Local Stack Status</div>
             <div class="subtitle">Quick view of core services.</div>
           </div>
-          <a href="https://HealthSecAlliance.com" target="_blank" class="cta primary" rel="noopener">HealthSecAlliance.com</a>
         </div>
 
         <div class="rows">
@@ -403,7 +388,7 @@ app.get('/', async (_req, res) => {
 
         ${db.ok ? '' : `<div class="foot">DB error: ${db.error}</div>`}
         <div class="foot">
-          <div class="links">Need help? Visit <a href="https://HealthSecAlliance.com" target="_blank" rel="noopener">HealthSec Alliance</a>. &nbsp;|&nbsp; <a href="http://localhost:${process.env.FAQ_HOST_PORT || '3034'}" target="_blank" rel="noopener">FAQs</a></div>
+          <div class="links"><a href="http://127.0.0.1:${process.env.FAQ_HOST_PORT || '3034'}" target="_blank" rel="noopener">FAQs and demo logins</a></div>
         </div>
       </div>
     </div>
@@ -477,7 +462,7 @@ faq.get('/', (_req, res) => {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TrustStack™ Suite — FAQs</title>
+    <title>Trust Stack Demo: FAQs</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <style>
       body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0f172a;background:#fff}
@@ -491,7 +476,7 @@ faq.get('/', (_req, res) => {
   </head>
   <body>
     <div class="wrap">
-      <h1>TrustStack™ Suite — FAQs</h1>
+      <h1>Trust Stack Demo: FAQs</h1>
       <div class="card">
         <div class="muted">Default demo credentials</div>
         <ul>
@@ -500,7 +485,7 @@ faq.get('/', (_req, res) => {
           <li>Grafana: <code>${process.env.GRAFANA_ADMIN_USER || 'admin'}</code> / <code>${process.env.GRAFANA_ADMIN_PASSWORD || 'env-missing'}</code></li>
           <li>ERPNext: <code>${process.env.ERP_BOOTSTRAP_ADMIN_USER || 'Administrator'}</code> / <code>${process.env.ERP_BOOTSTRAP_ADMIN_PASSWORD || 'env-missing'}</code> <span class="muted">(email alias: <code>${process.env.ERP_BOOTSTRAP_ADMIN_EMAIL || 'admin@example.com'}</code>; direct-bind: <code>http://localhost:${process.env.ERP_MES_HOST_PORT || '3036'}</code>; site: <code>${process.env.ERP_SITE_NAME || 'localhost'}</code>)</span></li>
         </ul>
-        <div class="muted">Rotate these in production.</div>
+        <div class="muted">Change every one of these before any shared use.</div>
       </div>
     </div>
   </body>
