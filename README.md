@@ -4,6 +4,8 @@ Two things live here. The first is a curated index of 63 security, observability
 
 **Status: prototype.** Checked without Docker on October 2, 2026 (Node 22.19.0, Apple Silicon Mac). All 11 JavaScript files pass `node --check`, and `npm ci` passes for all six services. The base, dev and mes Compose files pass the Compose Specification schema. The simulator, anomaly service, event relay, ERPNext poller and status page each start on their own and answer their health endpoints. Both test-lite scripts pass as documented. CI starts the default-profile stack and checks every published endpoint on each push.
 
+[![CI](https://github.com/cyber-physical-engineering/opensource_truststack/actions/workflows/ci.yml/badge.svg)](https://github.com/cyber-physical-engineering/opensource_truststack/actions/workflows/ci.yml)
+
 James Thornton set the architecture and requirements. The code was written with AI-assisted development in late 2025. The tests and checks were re-run in October 2026.
 
 ## The index
